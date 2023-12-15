@@ -21,7 +21,7 @@ class S3Client:
             "aws_secret_access_key": os.environ.get("AWS_SECRET_ACCESS_KEY"),
             "region_name": os.environ.get("AWS_REGION", "us-west-1"),  # Usando um valor padrão se a variável não estiver definida
             "s3_bucket": os.environ.get("S3_BUCKET_NAME"),
-            "datalake" : os.environ.get("CATALOGO_S3_PATH")
+            "datalake" : os.environ.get("DELTA_LAKE_S3_PATH")
         }
 
         for var in self._envs:
