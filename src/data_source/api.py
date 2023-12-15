@@ -19,9 +19,6 @@ class APICollector:
         response = self.transformDf(response)
         response = self.convertToParquet(response)
 
-        # self._buffer = pd.read_parquet(self._buffer)
-        # print(self._buffer)
-
         if self._buffer is not None:
             file_name = self.fileName()
             print(file_name)
