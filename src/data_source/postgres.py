@@ -2,7 +2,7 @@ import pandas as pd
 from tools.db.database_connection import Session
 from contracts.transactions import Transaction
 import os
-from datetime import datetime
+import datetime
 from io import BytesIO
 from tools.aws.client import S3Client
 from contracts.transactions import Transaction
@@ -37,7 +37,7 @@ class PostgresCollector:
         return df
     
     def transform_add_columns(self, df, datasource_value):
-        df['created_at'] = datetime.now()
+        df['created_at'] = datetime.datetime.now().isoformat()
         df['datasource'] = datasource_value
         return df
     

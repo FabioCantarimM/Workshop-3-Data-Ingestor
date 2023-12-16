@@ -18,14 +18,10 @@ def getPostgre(aws):
 # schedule.every(5).minutes.do(getAPI, aws)
 # schedule.every().day.at("08:00").do(getPostgre, aws)
 
-while True:
-    schedule.run_pending()
-    time.sleep(1)
-# schedule.every(5).minutes.do(test)
-# schedule.every().day.at("08:00").do(tarefa1)
-# schedule.every().hour.do(tarefa2)
-# schedule.every(30).minutes.do(tarefa3)
-# aws = S3Client()
-# postgres = PostgresCollector(aws).start()
-getAPI(aws)
+# while True:
+#     schedule.run_pending()
+#     time.sleep(1)
+
+getPostgre(aws)
+# getAPI(aws)
 
