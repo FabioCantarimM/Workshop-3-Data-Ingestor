@@ -18,4 +18,6 @@ myduck.insertData('transactions',values,paths)
 
 result = myduck.selectData('transactions')
 
+myduck.exportToCSV(['ean', 'price', 'store', 'dateTime'],'datahandler/repository/result.csv', result)
+
 print(result)

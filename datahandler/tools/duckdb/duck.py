@@ -5,6 +5,7 @@ from pandas import DataFrame
 from io import BytesIO
 import os
 import duckdb
+import csv
 
 class Duckdb:
 
@@ -65,3 +66,10 @@ class Duckdb:
 
         query = f'SELECT {values} FROM {tableName} {where_clause} {group_clause} {order_clause}'
         return self._con.execute(query).fetchall()
+    
+    def exportToCSV(self, header,path:str, data):
+        content: list = []
+        with open(path, 'w', newline='') as file_csv:
+           writer_csv = csv.writer(file_csv)
+           writer_csv.writerow(header)
+           writer_csv.writerows(data)
