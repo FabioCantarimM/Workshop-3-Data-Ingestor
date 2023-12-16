@@ -29,7 +29,7 @@ async def gerar_compra():
             "ean": int(tuple["EAN"]),
             "price":  round(float(tuple["Price"])*1.2,2),
             "clientPosition": fake.location_on_land(),
-            "store": 2,
+            "store": 11,
             "dateTime": fake.iso8601()
         }]
 
@@ -49,7 +49,7 @@ async def gerar_compras(numero_registros: int):
             "ean": int(tuple["EAN"]),
             "price":  round(float(tuple["Price"])*1.2,2),
             "clientPosition": fake.location_on_land(),
-            "store": 2,
+            "store": 11,
             "dateTime": fake.iso8601()
         }
         pessoas.append(pessoa)
