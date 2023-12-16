@@ -5,12 +5,14 @@ import os
 from datetime import datetime
 from io import BytesIO
 from tools.aws.client import S3Client
+from contracts.transactions import Transaction
 
 class PostgresCollector:
-    def __init__(self, model: Transaction, aws_client: S3Client):
-        self._model = model
+    def __init__(self, aws_client: S3Client):
+        self._model = Transaction
         self._buffer = None
-        self._fileName = os.environ.get("DB_NAME"),
+        self._fileName = os.environ.get("DB_NAME")
+        self._aws = aws_client
         
 
     def start(self):
@@ -46,7 +48,6 @@ class PostgresCollector:
             try:
                  df.to_parquet(self._buffer)
                  return self._buffer
-                # return response.to_parquet('exemplo.parquet', compression='snappy')
             except:
                 print("Error ao transformar o Df em Parquet")
                 self._buffer = None

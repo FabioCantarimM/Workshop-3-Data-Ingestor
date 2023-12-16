@@ -6,10 +6,13 @@ GenericSchema = Dict[str, Union[str, float, int]]
 # Definindo o schema base
 BaseSchema: GenericSchema = {
     # Espera uma string
-    "ean": str,
+    "ean": int,
 
-    # Espera um número (pode ser float ou int)
-    "price": str,
+    # Espera um número (Float)
+    "price": float,
+
+    # Espera um número (Inteiro)
+    "store": int,
 
     # Espera uma string, idealmente no formato de data
     "dateTime": str

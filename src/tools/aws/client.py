@@ -4,10 +4,6 @@ from pyathena import connect
 import sys
 import os
 
-from dotenv import load_dotenv
-
-load_dotenv()
-
 # Suponha que você tenha uma variável de ambiente chamada "MINHA_VARIAVEL"
 # Você pode acessar seu valor usando a função os.environ.get()
 
