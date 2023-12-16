@@ -1,18 +1,28 @@
 import pandas as pd
-from tools.db.database_connection import Session
+from tools.db.database_connection import getDbConnectionById
 from contracts.transactions import Transaction
 import os
 import datetime
 from io import BytesIO
 from tools.aws.client import S3Client
 from contracts.transactions import Transaction
+import sys
 
 class PostgresCollector:
-    def __init__(self, aws_client: S3Client):
+    def __init__(self, aws_client: S3Client, bdId: int):
+        self._envs = {
+            "fileName" : os.environ.get(f"DB_NAME{bdId}"),
+            "tbName" : os.environ.get(f"DB_TABLE{bdId}")
+        }
+        self._bdId = bdId
         self._model = Transaction
         self._buffer = None
-        self._fileName = os.environ.get("DB_NAME")
         self._aws = aws_client
+
+        for var in self._envs:
+            if self._envs[var] is None:
+                print(f"A variável de ambiente {var} não está definida.")
+                sys.exit(1)
         
 
     def start(self):
@@ -31,8 +41,9 @@ class PostgresCollector:
         return False
 
     def extract_data(self):
-        session = Session()
-        df = pd.read_sql(session.query(self._model).statement, session.bind)
+        session = getDbConnectionById(self._bdId)
+        query = self.createYesterdayQuery()
+        df = pd.read_sql(query, session.bind)
         session.close()
         return df
     
@@ -60,4 +71,12 @@ class PostgresCollector:
     def fileName(self):
             data_atual = datetime.datetime.now().isoformat()
             match = data_atual.split(".")
-            return f'postgres/{self._fileName}-{match[0]}.parquet'
+            fileName = self._envs['fileName']
+            return f'postgres/{fileName}-{match[0]}.parquet'
+    
+    def createYesterdayQuery(self):
+        yesterday = datetime.datetime.now() - datetime.timedelta(days=1)
+        yesterday = yesterday.strftime('%Y-%m-%d')
+        table = self._envs["tbName"]
+        query = f"SELECT * FROM {table} WHERE transaction_time >= '{yesterday}'::timestamp"
+        return query
