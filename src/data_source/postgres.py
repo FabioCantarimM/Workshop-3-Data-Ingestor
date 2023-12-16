@@ -1,19 +1,17 @@
 import pandas as pd
 from tools.db.database_connection import Session
 from contracts.transactions import Transaction
+import os
 from datetime import datetime
-from deltalake.writer import write_deltalake
-import pyarrow as pa
+from io import BytesIO
 from tools.aws.client import S3Client
 
 class PostgresCollector:
     def __init__(self, model: Transaction, aws_client: S3Client):
         self._model = model
-        self._aws_access_key_id = aws_client._envs["aws_access_key_id"]
-        self._aws_secret_access_key = aws_client._envs["aws_secret_access_key"]
-        self._region_name = aws_client._envs["region_name"]
-        self._s3_bucket = aws_client._envs["s3_bucket"]
-        self._datalake = aws_client._envs["datalake"]
+        self._buffer = None
+        self._fileName = os.environ.get("DB_NAME"),
+        
 
     def start(self):
         df = self.extract_data()
@@ -21,9 +19,14 @@ class PostgresCollector:
         df = self.transform_add_columns(df, "postgres")
         print("Processo extract com sucesso")
         self.convert_to_delta(df)
-        # O código relacionado ao upload para o S3 foi removido
-        print("Processo finalizado com sucesso")
-        return True
+
+        if self._buffer is not None:
+            file_name = self.fileName()
+            print(file_name)
+            self._aws.upload_file(self._buffer, file_name)
+            return True
+        
+        return False
 
     def extract_data(self):
         session = Session()
@@ -39,28 +42,21 @@ class PostgresCollector:
     def convert_to_delta(self, df):
         try:
             # Converte o DataFrame do pandas para uma tabela PyArrow
-            arrow_table = pa.Table.from_pandas(df)
+            self._buffer = BytesIO()
+            try:
+                 df.to_parquet(self._buffer)
+                 return self._buffer
+                # return response.to_parquet('exemplo.parquet', compression='snappy')
+            except:
+                print("Error ao transformar o Df em Parquet")
+                self._buffer = None
 
-            # Define o URI da tabela Delta e as opções de armazenamento
-            print(f"S3 Bucket: {self._s3_bucket}")
-            print(f"Datalake Path: {self._datalake}")
-            delta_table_uri = f"{self._datalake}"
-            print(f"Delta Table URI: {delta_table_uri}")
-            storage_options = {
-                "AWS_ACCESS_KEY_ID": self._aws_access_key_id,
-                "AWS_SECRET_ACCESS_KEY": self._aws_secret_access_key,
-                "region": self._region_name,
-            }
-            # Salva a tabela PyArrow como uma tabela Delta
-            write_deltalake(
-                data=arrow_table,
-                table_or_uri=delta_table_uri,
-                mode="overwrite",
-                overwrite_schema=True,
-                storage_options=storage_options,
-            )
         except Exception as e:
             print(f"Erro ao converter DataFrame para Delta: {e}")
-            return False
-        return True
+            self._buffer = None
     
+
+    def fileName(self):
+            data_atual = datetime.datetime.now().isoformat()
+            match = data_atual.split(".")
+            return f'postgres/{self._fileName}-{match[0]}.parquet'

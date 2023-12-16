@@ -31,13 +31,6 @@ class S3Client:
 
         self.s3 = boto3.client('s3', aws_access_key_id=self._envs["aws_access_key_id"], aws_secret_access_key=self._envs["aws_secret_access_key"], region_name=self._envs["region_name"])
 
-        self.athena_con = connect(s3_staging_dir=self._envs["datalake"],
-               region_name=self._envs["region_name"],
-               cursor_class='pyathena.Cursor',
-               work_group='workshop',
-               aws_access_key_id=self._envs["aws_access_key_id"],
-               aws_secret_access_key=self._envs["aws_secret_access_key"])
-
     def upload_file(self, data, s3_key):
         try:
             self.s3.put_object(Body=data.getvalue(), Bucket=self._envs["s3_bucket"], Key=s3_key)
@@ -55,14 +48,3 @@ class S3Client:
             print(f"Arquivo {s3_key} não encontrado no bucket {self._envs['s3_bucket']}.")
         except Exception as e:
             print(f"Ocorreu um erro durante o download: {e}")
-
-
-    def athenaQuery(self, query):
-        with self.athena_con.cursor() as cursor:
-            cursor.execute(query)
-            resultado = cursor.fetchall()
-        
-        for linha in resultado:
-            print(linha)
-
-        return resultado
