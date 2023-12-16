@@ -5,7 +5,7 @@ from tools.duckdb.duck import Duckdb
 aws = S3Client()
 myduck = Duckdb(aws)
 
-myduck.getData('api')
+myduck.getData('catalogo')
 # myduck.getData('postgre')
 
 myduck.createTable('transactions', BaseSchema )
