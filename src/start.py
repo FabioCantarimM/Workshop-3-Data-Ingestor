@@ -25,6 +25,6 @@ def getDataWithDuck(aws):
 #     schedule.run_pending()
 #     time.sleep(1)
 
-getPostgre(aws,dbId = 1)
+getPostgre(aws,dbId = 2)
 # getAPI(aws)
 

@@ -73,3 +73,7 @@ class Duckdb:
            writer_csv = csv.writer(file_csv)
            writer_csv.writerow(header)
            writer_csv.writerows(data)
+
+    def dropTable(self, tableName):
+        query = f'Drop table {tableName}'
+        self._con.execute(query)

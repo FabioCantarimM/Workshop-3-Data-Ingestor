@@ -1,23 +1,30 @@
 from tools.aws.client import S3Client
-from contracts.schema import BaseSchema
+from contracts.schema import BaseSchemaPostgre
 from tools.duckdb.duck import Duckdb
 
 aws = S3Client()
 myduck = Duckdb(aws)
+tableName = 'transactionsPostgre'
 
-myduck.getData('catalogo')
-# myduck.getData('postgre')
+# myduck.getData('api')
+myduck.getData('postgre')
 
-myduck.createTable('transactions', BaseSchema )
+myduck.createTable(tableName, BaseSchemaPostgre )
 
-values = ['ean', 'price', 'store', 'dateTime']
+# values = ['ean', 'price', 'store', 'dateTime']
+values = ['id', 'transaction_id', 'transaction_time', 'ean', 'product_name',
+       'price', 'store', 'pos_number', 'pos_system', 'pos_version',
+       'pos_last_maintenance', 'operator', 'created_at', 'datasource']
+
 # paths = ['datahandler/repository/api.parquet', 'datahandler/repository/postgre.parquet']
-paths = ['datahandler/repository/api.parquet']
+paths = ['datahandler/repository/postgre.parquet']
 
-myduck.insertData('transactions',values,paths)
+myduck.insertData(tableName,values,paths)
 
-result = myduck.selectData('transactions')
+result = myduck.selectData(tableName)
 
-myduck.exportToCSV(['ean', 'price', 'store', 'dateTime'],'datahandler/repository/result.csv', result)
+myduck.exportToCSV(values,'datahandler/repository/result.csv', result)
+
+myduck.closeCon()
 
 print(result)
